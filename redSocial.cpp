@@ -110,6 +110,7 @@ void agregarAmigos(perfil &p) {
 
 bool visualizarAmigos(perfil &p) {
   if (p.size != 0) {
+    cout <<"Sus amigos son los siguientes: \n";
     for (int i = 0; i < p.size; i++) {
       cout << "----------------------------------------" << '\n';
       cout <<"ID de amigo : "<< i<< '\n';
@@ -123,6 +124,7 @@ bool visualizarAmigos(perfil &p) {
     return true;
   }
   else{
+    cout <<"***********************************************************\n";
     cout << "No tienes ningun amigo." << '\n';
     return false;
   }
@@ -172,7 +174,9 @@ void comunAmigos(perfil &p) {
       }
     }
   }
+  cout <<"***********************************************************\n";
   cout << "Tienes "<<contador <<" Amigos en comun."<<'\n';
+  cout <<"***********************************************************\n";
 }
 
 void enviarMensaje(perfil &d) {
@@ -254,8 +258,8 @@ bool inicio(string correo, string contrasena){
 
 bool sesion() {
   string correo,contrasena;
-
-    cout << "--Bienvenido a la Red Social de consola--" << '\n';
+    cout <<"***********************************************************\n";
+    cout << "--Bienvenido a la Red Social de consola--" << '\n' <<endl;
     cout << "Inicia sesion con tu correo y password:" << '\n';
     cout << "Ingresa tu correo :" << '\n';
     cin >> correo;
@@ -274,13 +278,14 @@ void opciones() {
   bool repeat = true;
   int op;
   while (repeat) {
+    cout <<"-----------------------------------------------------------\n";
     cout << "Presione 1 para ver sus amigos" << '\n';
     cout << "Presione 2 para agregar un nuevo amigo" << '\n';
     cout << "Presione 3 para eliminar un amigo" << '\n';
     cout << "Presione 4 para ver los amigos en comun con otro amigo" << '\n';
     cout << "Presione 5 para enviar un mensaje a un amigo" << '\n';
     cout << "Presione 6 para leer mis mensajes recibidos" << '\n';
-    cout << "Presione 7 para salir" << '\n';
+    cout << "Presione 7 para salir" << '\n'<<endl;;
     cout << "Ingresa la opcion: " << '\n';
     cin >> op;
 
