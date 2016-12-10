@@ -172,10 +172,12 @@ void enviarMensaje(perfil &d, perfil &p) {
   FILE * FileMensaje;
   char correoReceptor[50];
   char correoEmisor[50];
+  char nombreEmisor[50];
   string mensaje;
 
   strcpy(correoReceptor, (p.correo).c_str());
   strcpy(correoEmisor, (p.correo).c_str());
+  strcpy(nombreEmisor, (p.nombre).c_str());
 
   FileMensaje = fopen(correoReceptor,"a+");
 
@@ -183,13 +185,45 @@ void enviarMensaje(perfil &d, perfil &p) {
     cout << "No se puede crear el archivo" << '\n';
   }
   fprintf(FileMensaje, "Has recibido nuevo mensaje de ");
-  fwrite(correoEmisor,1,strlen(correoEmisor),FileMensaje);
+  fprintf(FileMensaje, "%s(%s)\n",nombreEmisor,correoEmisor );
   fprintf(FileMensaje, "\n");
   getline(cin,mensaje);
   fprintf(FileMensaje, "%s\n",mensaje.c_str() );
-  fprintf(FileMensaje, "\n\n");
+  fprintf(FileMensaje, "-------------------------------------------\n");
   fclose(FileMensaje);
 
+}
+
+void leerMensaje(perfil &p) {
+  FILE * FileMensaje;
+  char correo[50];
+
+  strcpy(correo, (p.correo).c_str());
+  long lSize;
+  char * texto;
+  size_t result;
+
+  FileMensaje = fopen ( correo , "rb" );
+  if (FileMensaje==NULL) {fputs ("File error",stderr); exit (1);}
+
+  // obtain file size:
+  fseek (FileMensaje , 0 , SEEK_END);
+  lSize = ftell (FileMensaje);
+  rewind (FileMensaje);
+
+  // allocate memory to contain the whole file:
+  texto = (char*) malloc (sizeof(char)*lSize);
+  if (texto == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+  // copy the file into the texto:
+  result = fread (texto,1,lSize,FileMensaje);
+  if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+  std::cout << texto << '\n';
+
+  // terminate
+  fclose (FileMensaje);
+  free (texto);
 }
 
 int main(int argc, char const *argv[]) {
@@ -209,6 +243,7 @@ int main(int argc, char const *argv[]) {
   perfil* persona2 = &redSocial.red[1];
 
   enviarMensaje(*persona1,*persona2);
+  leerMensaje(*persona2);
 
   /*cout<<"Agregando amigos de persona 1 : "<<persona1->nombre<<endl;
   agregarAmigos(*persona1);
