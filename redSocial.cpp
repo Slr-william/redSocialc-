@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <cstring>
 
-#include<fstream>
-
-
 #define TRED 100
 
 using namespace std;
@@ -22,22 +19,12 @@ struct perfil{
   int size = 0;
 };
 
+perfil * principal; //Para inicio de sesion
+
 struct redSocial{
   int size = 0;
   perfil red[TRED];
 }redSocial;
-
-void crearPerfil(string correo, string pass, string nombre, string sexo, string edad, string ciudad) {
-  perfil p;
-  p.correo = correo;
-  p.pass = pass;
-  p.nombre = nombre;
-  p.sexo = sexo;
-  p.edad = edad;
-  p.ciudad = ciudad;
-  redSocial.red[redSocial.size] = p;
-  redSocial.size++;
-}
 
 void visualizarPerfiles(perfil &p) {
   for (int i = 0; i < redSocial.size; i++) {
@@ -54,13 +41,27 @@ void visualizarPerfiles(perfil &p) {
   }
 }
 
-bool existe(string correo) {
-  for (int i = 0; i < redSocial.size; i++) {
-    if (redSocial.red[i].correo == correo) {
-      return true;
-    }
-    return false;
+int validacion(perfil &p){
+  visualizarPerfiles(p);
+  int id = 999;
+  while (id >redSocial.size) {
+    cout << "¿Con cual persona? (digita su ID)" << '\n';
+    cin >> id;
+    if(id > redSocial.size){cout << "Ingresa un ID existente" << '\n';}
   }
+  return id;
+}
+
+void crearPerfil(string correo, string pass, string nombre, string sexo, string edad, string ciudad) {
+  perfil p;
+  p.correo = correo;
+  p.pass = pass;
+  p.nombre = nombre;
+  p.sexo = sexo;
+  p.edad = edad;
+  p.ciudad = ciudad;
+  redSocial.red[redSocial.size] = p;
+  redSocial.size++;
 }
 
 void eliminarPerfiles(int id) {
@@ -97,13 +98,7 @@ void modificarPerfiles(int id) {
 }
 
 void agregarAmigos(perfil &p) {
-  visualizarPerfiles(p);
-  int id = 999;
-  while (id >redSocial.size) {
-    cout << "Cual persona quieres agregar a tus amigos? (digita su ID para agregarlo)" << '\n';
-    cin >> id;
-    if(id > redSocial.size){cout << "Ingresa un ID existente" << '\n';}
-  }
+  int id = validacion(p);
 
   perfil * nAmigo = &redSocial.red[id];
 
@@ -113,48 +108,60 @@ void agregarAmigos(perfil &p) {
   p.size++;
 }
 
-void visualizarAmigos(perfil &p) {
-  for (int i = 0; i < p.size; i++) {
-    cout << "----------------------------------------" << '\n';
-    cout <<"ID de amigo : "<< i<< '\n';
-    cout <<"Nombre: "<<p.amigos[i]->nombre<< '\n';
-    cout <<"Sexo: "<<p.amigos[i]->sexo<< '\n';
-    cout <<"Edad: "<<p.amigos[i]->edad<< '\n';
-    cout <<"Ciudad: "<<p.amigos[i]->ciudad<< '\n';
-    cout <<"Correo: "<<p.amigos[i]->correo<< '\n';
-    cout << "----------------------------------------" << '\n';
+bool visualizarAmigos(perfil &p) {
+  if (p.size != 0) {
+    for (int i = 0; i < p.size; i++) {
+      cout << "----------------------------------------" << '\n';
+      cout <<"ID de amigo : "<< i<< '\n';
+      cout <<"Nombre: "<<p.amigos[i]->nombre<< '\n';
+      cout <<"Sexo: "<<p.amigos[i]->sexo<< '\n';
+      cout <<"Edad: "<<p.amigos[i]->edad<< '\n';
+      cout <<"Ciudad: "<<p.amigos[i]->ciudad<< '\n';
+      cout <<"Correo: "<<p.amigos[i]->correo<< '\n';
+      cout << "----------------------------------------" << '\n';
+    }
+    return true;
+  }
+  else{
+    cout << "No tienes ningun amigo." << '\n';
+    return false;
   }
 }
 
 void eliminarAmigos(perfil &p) {
   int id;
   int idAux;
-  visualizarAmigos(p);
-  cout << "digita el ID del amigo que quieres eliminar" << '\n';
-  cin >> id;
-  idAux = id;
-  perfil *rAmigo = p.amigos[id];
+  if(visualizarAmigos(p)){
+    cout << "digita el ID del amigo que quieres eliminar" << '\n';
+    cin >> id;
+    idAux = id;
+    perfil *rAmigo = p.amigos[id];
 
-  for (int i = 0; i < rAmigo->size; i++) {
-    if (&p == rAmigo->amigos[i]) {
-      for (int i = idAux; i < rAmigo->size; i++) {
-        rAmigo->amigos[i] = rAmigo->amigos[i+1];
+    for (int i = 0; i < rAmigo->size; i++) {
+      if (&p == rAmigo->amigos[i]) {
+        for (int i = idAux; i < rAmigo->size; i++) {
+          rAmigo->amigos[i] = rAmigo->amigos[i+1];
+        }
+        rAmigo->size--;
+        break;
       }
-      rAmigo->size--;
-      break;
     }
-  }
 
-  for (int i = id; i < p.size; i++) {
-    p.amigos[i] = p.amigos[i+1];
+    for (int i = id; i < p.size; i++) {
+      p.amigos[i] = p.amigos[i+1];
+    }
+    p.size--;
   }
-  p.size--;
 }
 
-void comunAmigos(perfil &p, perfil &h) {
+void comunAmigos(perfil &p) {
+  int id = validacion(p);
+  perfil h = redSocial.red[id];
+  int contador = 0;
   for (int i = 0; i < p.size; i++) {
     for (int j = 0; j < h.size; j++) {
       if (p.amigos[i] == h.amigos[j]) {
+        contador++;
         cout << "----------------------------------------" << '\n';
         cout <<"Nombre: "<<p.amigos[i]->nombre<< '\n';
         cout <<"Sexo: "<<p.amigos[i]->sexo<< '\n';
@@ -165,9 +172,14 @@ void comunAmigos(perfil &p, perfil &h) {
       }
     }
   }
+  cout << "Tienes "<<contador <<" Amigos en comun."<<'\n';
 }
 
-void enviarMensaje(perfil &d, perfil &p) {
+void enviarMensaje(perfil &d) {
+
+  int id = validacion(d);
+
+  perfil p = redSocial.red[id];
 
   FILE * FileMensaje;
   char correoReceptor[50];
@@ -176,20 +188,23 @@ void enviarMensaje(perfil &d, perfil &p) {
   string mensaje;
 
   strcpy(correoReceptor, (p.correo).c_str());
-  strcpy(correoEmisor, (p.correo).c_str());
-  strcpy(nombreEmisor, (p.nombre).c_str());
+  strcpy(correoEmisor, (d.correo).c_str());
+  strcpy(nombreEmisor, (d.nombre).c_str());
 
   FileMensaje = fopen(correoReceptor,"a+");
 
   if (FileMensaje == NULL) {
     cout << "No se puede crear el archivo" << '\n';
   }
+  fprintf(FileMensaje, "--------------Inicio del mensaje-----------------------------\n");
   fprintf(FileMensaje, "Has recibido nuevo mensaje de ");
   fprintf(FileMensaje, "%s(%s)\n",nombreEmisor,correoEmisor );
   fprintf(FileMensaje, "\n");
+  cout << "Escribe el mensaje para tu amigo:" << '\n';
+  cin.ignore();
   getline(cin,mensaje);
   fprintf(FileMensaje, "%s\n",mensaje.c_str() );
-  fprintf(FileMensaje, "-------------------------------------------\n");
+  fprintf(FileMensaje, "--------------Final del mensaje-----------------------------\n");
   fclose(FileMensaje);
 
 }
@@ -199,11 +214,12 @@ void leerMensaje(perfil &p) {
   char correo[50];
 
   strcpy(correo, (p.correo).c_str());
+  std::cout << correo << '\n';
   long lSize;
   char * texto;
   size_t result;
 
-  FileMensaje = fopen ( correo , "rb" );
+  FileMensaje = fopen ( correo , "r+" );
   if (FileMensaje==NULL) {fputs ("File error",stderr); exit (1);}
 
   // obtain file size:
@@ -219,51 +235,91 @@ void leerMensaje(perfil &p) {
   result = fread (texto,1,lSize,FileMensaje);
   if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
 
-  std::cout << texto << '\n';
+  cout << texto << '\n';
 
   // terminate
   fclose (FileMensaje);
   free (texto);
 }
 
+bool inicio(string correo, string contrasena){
+  for (int i = 0; i < redSocial.size; i++) {
+    if (!correo.compare(redSocial.red[i].correo) && !contrasena.compare(redSocial.red[i].pass)) {
+      principal = &redSocial.red[i];
+      return true;
+    }
+  }
+  return false;
+}
+
+bool sesion() {
+  string correo,contrasena;
+
+    cout << "--Bienvenido a la Red Social de consola--" << '\n';
+    cout << "Inicia sesion con tu correo y password:" << '\n';
+    cout << "Ingresa tu correo :" << '\n';
+    cin >> correo;
+    cout << "Ingresa tu password:" << '\n';
+    cin >> contrasena;
+
+    if (inicio(correo, contrasena)) {
+      return true;
+    }
+    else{
+      sesion();
+    }
+}
+
+void opciones() {
+  bool repeat = true;
+  int op;
+  while (repeat) {
+    cout << "Presione 1 para ver sus amigos" << '\n';
+    cout << "Presione 2 para agregar un nuevo amigo" << '\n';
+    cout << "Presione 3 para eliminar un amigo" << '\n';
+    cout << "Presione 4 para ver los amigos en comun con otro amigo" << '\n';
+    cout << "Presione 5 para enviar un mensaje a un amigo" << '\n';
+    cout << "Presione 6 para leer mis mensajes recibidos" << '\n';
+    cout << "Presione 7 para salir" << '\n';
+    cout << "Ingresa la opcion: " << '\n';
+    cin >> op;
+
+    switch (op) {
+      case 1: visualizarAmigos(*principal); break;
+      case 2: agregarAmigos(*principal);break;
+      case 3: eliminarAmigos(*principal);break;
+      case 4: comunAmigos(*principal);break;
+      case 5: enviarMensaje(*principal);break;
+      case 6: leerMensaje(*principal);break;
+      case 7: repeat = false;break;
+      default:cout << "Ingresa una opcion correcta." << '\n';
+    }
+  }
+}
+
+void menu() {
+  string op;
+  bool repeat = true;
+  while(repeat){
+    sesion();
+    opciones();
+    cout << "Quieres iniciar sesion con otra cuenta? (si|no)" << '\n';
+    cin >> op;
+    if (op == "no") {
+      repeat = false;
+    }
+  }
+}
+
 int main(int argc, char const *argv[]) {
   crearPerfil("alg@jdjdjf,com","1234567","Adolfo Hitler", "Indefinido","12","Munich");
-  crearPerfil("1213443.com","varias","Carl Sagan", "Masculino","49","California");
+  crearPerfil("carl@ciencia.com","123456","Carl Sagan", "Masculino","49","California");
   crearPerfil("maruja.com","otro","Pepito perez", "Masculino","19","Pereira");
   crearPerfil("Pelado@htomail.com","contrasena","Vago libertario", "Masculino","20","Dosquebradas");
   crearPerfil("jdii@htomail.com","contrasena","Mamerto libertario", "Masculino","20","Somalia");
   crearPerfil("ertyo@htomail.com","contrasena","Nerdo de clase", "Masculino","20","Somalia");
-  //visualizarPerfiles();
-  /*eliminarPerfiles(0);
-  visualizarPerfiles();
-  cout<<"1111111111111111111111111111111"<<endl;*/
-  //modificarPerfiles(0);
-  //visualizarPerfiles();
-  perfil* persona1 = &redSocial.red[0];
-  perfil* persona2 = &redSocial.red[1];
+  crearPerfil("w.as.g@utp.edu.co","123456","William Salazar", "Masculino","23","Pereira");
 
-  enviarMensaje(*persona1,*persona2);
-  leerMensaje(*persona2);
-
-  /*cout<<"Agregando amigos de persona 1 : "<<persona1->nombre<<endl;
-  agregarAmigos(*persona1);
-  agregarAmigos(*persona1);
-  agregarAmigos(*persona1);
-  cout<<"Agregando amigos de persona 2 : "<<persona2->nombre<<endl;
-  agregarAmigos(*persona2);
-  agregarAmigos(*persona2);
-  cout<<"Visualizando amigos en comun de persona 1 y persona 2"<<endl;
-  comunAmigos(*persona1,*persona2);*/
-
-  /*cout<<"Visualizando amigos de la persona 1"<<endl;
-  visualizarAmigos(*persona1);
-  cout<<"Visualizando amigos de la persona 2"<<endl;
-  visualizarAmigos(*persona2);
-  cout<<"Eliminar amigos ahora"<<endl;
-  eliminarAmigos(*persona1);
-  cout<<"Visualizando amigos de la persona 1 despues de eliminar"<<endl;
-  visualizarAmigos(*persona1);
-  cout<<"Visualizando amigos de la persona 2 despues de eliminar"<<endl;
-  visualizarAmigos(*persona2);*/
+  menu();
   return 0;
 }
