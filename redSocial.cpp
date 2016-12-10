@@ -1,5 +1,11 @@
 #include<iostream>
 #include<string>
+#include <stdlib.h>
+#include <stdio.h>
+#include <cstring>
+
+#include<fstream>
+
 
 #define TRED 100
 
@@ -33,16 +39,18 @@ void crearPerfil(string correo, string pass, string nombre, string sexo, string 
   redSocial.size++;
 }
 
-void visualizarPerfiles() {
+void visualizarPerfiles(perfil &p) {
   for (int i = 0; i < redSocial.size; i++) {
-    cout << "----------------------------------------" << '\n';
-    cout << "ID : " << i << '\n';
-    cout <<"Nombre: "<<redSocial.red[i].nombre<< '\n';
-    cout <<"Sexo: "<<redSocial.red[i].sexo<< '\n';
-    cout <<"Edad: "<<redSocial.red[i].edad<< '\n';
-    cout <<"Ciudad: "<<redSocial.red[i].ciudad<< '\n';
-    cout <<"Correo: "<<redSocial.red[i].correo<< '\n';
-    cout << "----------------------------------------" << '\n';
+    if(p.correo != redSocial.red[i].correo){
+      cout << "----------------------------------------" << '\n';
+      cout << "ID : " << i << '\n';
+      cout <<"Nombre: "<<redSocial.red[i].nombre<< '\n';
+      cout <<"Sexo: "<<redSocial.red[i].sexo<< '\n';
+      cout <<"Edad: "<<redSocial.red[i].edad<< '\n';
+      cout <<"Ciudad: "<<redSocial.red[i].ciudad<< '\n';
+      cout <<"Correo: "<<redSocial.red[i].correo<< '\n';
+      cout << "----------------------------------------" << '\n';
+    }
   }
 }
 
@@ -89,7 +97,7 @@ void modificarPerfiles(int id) {
 }
 
 void agregarAmigos(perfil &p) {
-  visualizarPerfiles();
+  visualizarPerfiles(p);
   int id = 999;
   while (id >redSocial.size) {
     cout << "Cual persona quieres agregar a tus amigos? (digita su ID para agregarlo)" << '\n';
@@ -122,7 +130,7 @@ void eliminarAmigos(perfil &p) {
   int id;
   int idAux;
   visualizarAmigos(p);
-  std::cout << "digita el ID del amigo que quieres eliminar" << '\n';
+  cout << "digita el ID del amigo que quieres eliminar" << '\n';
   cin >> id;
   idAux = id;
   perfil *rAmigo = p.amigos[id];
@@ -148,36 +156,70 @@ void comunAmigos(perfil &p, perfil &h) {
     for (int j = 0; j < h.size; j++) {
       if (p.amigos[i] == h.amigos[j]) {
         cout << "----------------------------------------" << '\n';
-        cout <<"Nombre: "<<p.amigos[i].nombre<< '\n';
-        cout <<"Sexo: "<<p.amigos[i].sexo<< '\n';
-        cout <<"Edad: "<<p.amigos[i].edad<< '\n';
-        cout <<"Ciudad: "<<p.amigos[i].ciudad<< '\n';
-        cout <<"Correo: "<<p.amigos[i].correo<< '\n';
+        cout <<"Nombre: "<<p.amigos[i]->nombre<< '\n';
+        cout <<"Sexo: "<<p.amigos[i]->sexo<< '\n';
+        cout <<"Edad: "<<p.amigos[i]->edad<< '\n';
+        cout <<"Ciudad: "<<p.amigos[i]->ciudad<< '\n';
+        cout <<"Correo: "<<p.amigos[i]->correo<< '\n';
         cout << "----------------------------------------" << '\n';
       }
     }
   }
 }
 
+void enviarMensaje(perfil &d, perfil &p) {
+
+  FILE * FileMensaje;
+  char correoReceptor[50];
+  char correoEmisor[50];
+  string mensaje;
+
+  strcpy(correoReceptor, (p.correo).c_str());
+  strcpy(correoEmisor, (p.correo).c_str());
+
+  FileMensaje = fopen(correoReceptor,"a+");
+
+  if (FileMensaje == NULL) {
+    cout << "No se puede crear el archivo" << '\n';
+  }
+  fprintf(FileMensaje, "Has recibido nuevo mensaje de ");
+  fwrite(correoEmisor,1,strlen(correoEmisor),FileMensaje);
+  fprintf(FileMensaje, "\n");
+  getline(cin,mensaje);
+  fprintf(FileMensaje, "%s\n",mensaje.c_str() );
+  fprintf(FileMensaje, "\n\n");
+  fclose(FileMensaje);
+
+}
 
 int main(int argc, char const *argv[]) {
   crearPerfil("alg@jdjdjf,com","1234567","Adolfo Hitler", "Indefinido","12","Munich");
   crearPerfil("1213443.com","varias","Carl Sagan", "Masculino","49","California");
   crearPerfil("maruja.com","otro","Pepito perez", "Masculino","19","Pereira");
   crearPerfil("Pelado@htomail.com","contrasena","Vago libertario", "Masculino","20","Dosquebradas");
-  visualizarPerfiles();
-  cout<<"0000000000000000000000000000000"<<endl;
+  crearPerfil("jdii@htomail.com","contrasena","Mamerto libertario", "Masculino","20","Somalia");
+  crearPerfil("ertyo@htomail.com","contrasena","Nerdo de clase", "Masculino","20","Somalia");
+  //visualizarPerfiles();
   /*eliminarPerfiles(0);
   visualizarPerfiles();
   cout<<"1111111111111111111111111111111"<<endl;*/
   //modificarPerfiles(0);
   //visualizarPerfiles();
-  cout<<"3333333333333333333333333333333"<<endl;
   perfil* persona1 = &redSocial.red[0];
   perfil* persona2 = &redSocial.red[1];
+
+  enviarMensaje(*persona1,*persona2);
+
+  /*cout<<"Agregando amigos de persona 1 : "<<persona1->nombre<<endl;
   agregarAmigos(*persona1);
   agregarAmigos(*persona1);
   agregarAmigos(*persona1);
+  cout<<"Agregando amigos de persona 2 : "<<persona2->nombre<<endl;
+  agregarAmigos(*persona2);
+  agregarAmigos(*persona2);
+  cout<<"Visualizando amigos en comun de persona 1 y persona 2"<<endl;
+  comunAmigos(*persona1,*persona2);*/
+
   /*cout<<"Visualizando amigos de la persona 1"<<endl;
   visualizarAmigos(*persona1);
   cout<<"Visualizando amigos de la persona 2"<<endl;
